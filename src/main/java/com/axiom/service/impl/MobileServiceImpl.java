@@ -20,8 +20,11 @@ import org.springframework.web.client.RestTemplate;
 import com.axiom.exception.MobileNotFoundException;
 import com.axiom.model.Mobile;
 import com.axiom.service.MobileService;
+import com.axiom.util.ApiConstants;
 import com.axiom.util.ErrorConstants;
+import com.axiom.util.Utility;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Objects;
 
 @Service
 public class MobileServiceImpl implements MobileService {
@@ -36,7 +39,7 @@ public class MobileServiceImpl implements MobileService {
 	@Value("${mobile.db.api}")
 	private String mobileDbApi;
 
-	private static String mobileDbResponse;
+	private String mobileDbResponse;
 
 	@PostConstruct
 	public void postConstruct() {
@@ -47,60 +50,58 @@ public class MobileServiceImpl implements MobileService {
 	@Override
 	public List<Mobile> searchMobile(HttpServletRequest request, Map<String, String> params)
 			throws MobileNotFoundException {
-
-		JSONArray jsonArray = new JSONArray(mobileDbResponse);
-		JSONArray resultArray = new JSONArray();
-
-		for (Map.Entry<String, String> entry : params.entrySet()) {
-			String key = entry.getKey();
-			String value = entry.getValue().toLowerCase();
-			for (int i = 0; i <= jsonArray.length() - 1; i++) {
-				JSONObject json = jsonArray.getJSONObject(i);
-
-				JSONObject jsonRelease = json.getJSONObject("release");
-				JSONObject jsonHardware = json.getJSONObject("hardware");
-				boolean isRelease = false;
-				boolean isHardware = false;
-				if (jsonRelease.has(key)) {
-					Object currentValue = jsonRelease.get(key);
-					if (currentValue instanceof Double) {
-						if (currentValue == value) {
-							isRelease = true;
-						}
-					} else if (Pattern.compile(Pattern.quote(value), Pattern.CASE_INSENSITIVE)
-							.matcher((CharSequence) currentValue).find()) {
-						isRelease = true;
-					}
-				}
-				if (jsonHardware.has(key) && jsonHardware.getString(key).contains(value)) {
-					isHardware = true;
-				}
-
-				Object currentValue = json.get(key);
-				if (currentValue instanceof Long) {
-					if (currentValue == value) {
-						resultArray.put(json);
-					}
-				} else if (json.has(key) && Pattern.compile(Pattern.quote(value), Pattern.CASE_INSENSITIVE)
-						.matcher((CharSequence) currentValue).find()) {
-					resultArray.put(json);
-				} else if (isRelease || isHardware) {
-					resultArray.put(json);
-				}
-			}
-			jsonArray = resultArray;
-			resultArray = new JSONArray();
-		}
-
 		try {
-			List<Mobile> mobilesList = mapper.readValue(jsonArray.toString(),
-					mapper.getTypeFactory().constructCollectionType(List.class, Mobile.class));
-			return mobilesList;
+			JSONArray jsonArray = new JSONArray(mobileDbResponse);
+			JSONArray resultArray = new JSONArray();
+
+			for (Map.Entry<String, String> entry : params.entrySet()) {
+				String key = entry.getKey();
+				String value = entry.getValue();
+
+				for (int i = 0; i <= jsonArray.length() - 1; i++) {
+					JSONObject json = jsonArray.getJSONObject(i);
+
+					fetchMobilesBasedOnInputConditions(json, resultArray, key, value);
+				}
+				jsonArray = resultArray;
+				resultArray = new JSONArray();
+			}
+
+			return Utility.fetchMobilesFromResponse(jsonArray.toString(), mapper);
 		} catch (Exception e) {
 			LOGGER.error(ErrorConstants.SERVICE_EXCEPTION);
 			throw new MobileNotFoundException(ErrorConstants.MOBILE_NOT_FOUND_MESSAGE);
 		}
 
+	}
+
+	private void fetchMobilesBasedOnInputConditions(JSONObject json, JSONArray resultArray, String key, String value) {
+
+		boolean isKeyExistInRelease = isKeyExistsInJson(json.getJSONObject(ApiConstants.RELEASE_KEY), key, value);
+
+		boolean isKeyExistInHardware = isKeyExistsInJson(json.getJSONObject(ApiConstants.HARDWARE_KEY), key, value);
+
+		boolean isKeyExistInMobileParent = isKeyExistsInJson(json, key, value);
+
+		if (isKeyExistInMobileParent || isKeyExistInRelease || isKeyExistInHardware) {
+			resultArray.put(json);
+		}
+	}
+
+	private boolean isKeyExistsInJson(JSONObject json, String key, String value) {
+		boolean isExists = false;
+		if (json.has(key)) {
+			Object currentValue = json.get(key);
+			if (currentValue instanceof Integer) {
+				if (Objects.equal(currentValue, Integer.parseInt(value))) {
+					isExists = true;
+				}
+			} else if (Pattern.compile(Pattern.quote(value), Pattern.CASE_INSENSITIVE)
+					.matcher((CharSequence) currentValue).find()) {
+				isExists = true;
+			}
+		}
+		return isExists;
 	}
 
 }

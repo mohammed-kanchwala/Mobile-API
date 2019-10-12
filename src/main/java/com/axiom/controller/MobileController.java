@@ -31,16 +31,12 @@ public class MobileController {
 	@Autowired
 	private MobileService searchService;
 
-
 	@GetMapping(ApiConstants.SEARCH)
 	@ApiOperation(value = SwaggerTags.VALUE_MOBILE_SEARCH, notes = SwaggerTags.NOTES_MOBILE_SEARCH)
 	@ApiResponses(value = { @ApiResponse(code = 200, message = SwaggerResponse.MOBILE_SEARCH_DETAILS),
 			@ApiResponse(code = 422, message = SwaggerResponse.SERVICE_EXCEPTION) })
 	public List<Mobile> searchMobile(HttpServletRequest request, @RequestParam Map<String, String> search)
 			throws MobileNotFoundException {
-		if (search != null) {
-			return searchService.searchMobile(request, search);
-		}
-		return null;
+		return searchService.searchMobile(request, search);
 	}
 }

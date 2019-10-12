@@ -12,7 +12,7 @@ import com.axiom.util.ErrorConstants;
 @RestControllerAdvice
 public class MobileNotFoundExceptionHandler {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MobileNotFoundException.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MobileNotFoundExceptionHandler.class);
 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(value = HttpStatus.UNPROCESSABLE_ENTITY)

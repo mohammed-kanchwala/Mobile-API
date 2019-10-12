@@ -8,4 +8,7 @@ public class ErrorConstants {
     public static final String MOBILE_NOT_FOUND = "MOBILE_NOT_FOUND";
     public static final String MOBILE_NOT_FOUND_MESSAGE = "Mobile you are trying to search is not available";
 
+    private ErrorConstants () {
+    	
+    }
 }

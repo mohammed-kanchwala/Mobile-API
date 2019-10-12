@@ -9,4 +9,5 @@ public class ApiConstants {
     public static final String MOBILE_SERVICES = "Mobile Details APIs";
 
     public static final String SEARCH = "/search";
+    
 }

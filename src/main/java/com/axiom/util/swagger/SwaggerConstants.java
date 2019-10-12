@@ -1,4 +1,4 @@
-package com.axiom.util;
+package com.axiom.util.swagger;
 
 public class SwaggerConstants {
     public static final String SWAGGER_DOC_API = "/v2/api-docs";

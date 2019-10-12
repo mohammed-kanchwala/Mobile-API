@@ -50,6 +50,7 @@ public class MobileServiceImpl implements MobileService {
 	@Override
 	public List<Mobile> searchMobile(HttpServletRequest request, Map<String, String> params)
 			throws MobileNotFoundException {
+		List<Mobile> mobileList = null;
 		try {
 			JSONArray jsonArray = new JSONArray(mobileDbResponse);
 			JSONArray resultArray = new JSONArray();
@@ -67,12 +68,15 @@ public class MobileServiceImpl implements MobileService {
 				resultArray = new JSONArray();
 			}
 
-			return Utility.fetchMobilesFromResponse(jsonArray.toString(), mapper);
+			mobileList = Utility.fetchMobilesFromResponse(jsonArray.toString(), mapper);
+			if (mobileList.isEmpty()) {
+				throw new MobileNotFoundException(ErrorConstants.MOBILE_NOT_FOUND_MESSAGE);
+			}
 		} catch (Exception e) {
 			LOGGER.error(ErrorConstants.SERVICE_EXCEPTION);
 			throw new MobileNotFoundException(ErrorConstants.MOBILE_NOT_FOUND_MESSAGE);
 		}
-
+		return mobileList;
 	}
 
 	private void fetchMobilesBasedOnInputConditions(JSONObject json, JSONArray resultArray, String key, String value) {

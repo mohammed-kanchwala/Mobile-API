@@ -25,6 +25,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.axiom.model.Mobile;
 import com.axiom.util.ApiConstants;
+import com.axiom.util.ErrorConstants;
 import com.axiom.util.Utility;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -84,7 +85,7 @@ public class MobileControllerTest {
 
 	@Test
 	@DisplayName("Test for priceEur=200")
-	public void searchMobile_price_200() throws Exception {
+	public void searchMobile_Price_200() throws Exception {
 		UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(Utility.createURI(port))
 				.queryParam(ApiConstants.PRICE_EUR_KEY, 200);
 		ResponseEntity<String> response = restTemplate.getForEntity(builder.toUriString(), String.class);
@@ -95,9 +96,9 @@ public class MobileControllerTest {
 
 	@Test
 	@DisplayName("Test for priceEur=200 & announceDate=1999")
-	public void searchMobile_price_200_And_AnnounceDate_1999() throws Exception {
+	public void searchMobile_Price_200_And_AnnounceDate_1999() throws Exception {
 		UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(Utility.createURI(port))
-				.queryParam(ApiConstants.PRICE_EUR_KEY, 200).queryParam(ApiConstants.ANNOUNCE_DATE_KEY, 1999);
+				.queryParam(ApiConstants.PRICE_EUR_KEY, 200).queryParam(ApiConstants.ANNOUNCE_DATE_KEY, "1999");
 		ResponseEntity<String> response = restTemplate.getForEntity(builder.toUriString(), String.class);
 
 		List<Mobile> mobilesList = checkStatusAndGetReponseObject(response);
@@ -106,15 +107,48 @@ public class MobileControllerTest {
 
 	@Test
 	@DisplayName("Test for priceEur=1100 & announceDate=2018")
-	public void searchMobile_price_1100_And_AnnounceDate_2018() throws Exception {
+	public void searchMobile_Price_1100_And_AnnounceDate_2018() throws Exception {
 		UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(Utility.createURI(port))
-				.queryParam(ApiConstants.PRICE_EUR_KEY, 1100).queryParam(ApiConstants.ANNOUNCE_DATE_KEY, 2018);
+				.queryParam(ApiConstants.PRICE_EUR_KEY, 1100).queryParam(ApiConstants.ANNOUNCE_DATE_KEY, "2018");
 		ResponseEntity<String> response = restTemplate.getForEntity(builder.toUriString(), String.class);
 
 		List<Mobile> mobileList = checkStatusAndGetReponseObject(response);
 		assertEquals(1, mobileList.size());
 	}
 
+	@Test
+	@DisplayName("Test for brand=Apple & announceDate=2018")
+	public void searchMobile_Brand_Apple_And_AnnounceDate_2018() throws Exception {
+		UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(Utility.createURI(port))
+				.queryParam(ApiConstants.BRAND_KEY, "Apple").queryParam(ApiConstants.ANNOUNCE_DATE_KEY, "2018");
+		ResponseEntity<String> response = restTemplate.getForEntity(builder.toUriString(), String.class);
+
+		List<Mobile> mobileList = checkStatusAndGetReponseObject(response);
+		assertEquals(8, mobileList.size());
+	}
+
+	@Test
+	@DisplayName("Test for brand=Apple & announceDate=2018 & sim=eSIM")
+	public void searchMobile_Brand_Apple_And_AnnounceDate_2018_And_Sim_ESIM() throws Exception {
+		UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(Utility.createURI(port))
+				.queryParam(ApiConstants.BRAND_KEY, "Apple").queryParam(ApiConstants.ANNOUNCE_DATE_KEY, "2018")
+				.queryParam(ApiConstants.SIM_KEY, ApiConstants.NANO_SIM);
+		ResponseEntity<String> response = restTemplate.getForEntity(builder.toUriString(), String.class);
+
+		List<Mobile> mobileList = checkStatusAndGetReponseObject(response);
+		assertEquals(5, mobileList.size());
+	}
+
+	@Test
+	@DisplayName("Test for MobileNotFoundException")
+	public void searchMobile_MobileNotFoundException() throws Exception {
+		UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(Utility.createURI(port))
+				.queryParam(ApiConstants.BRAND_KEY, "Nokia");
+		ResponseEntity<String> response = restTemplate.getForEntity(builder.toUriString(), String.class);
+
+		assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, response.getStatusCode());
+	}
+	
 	private List<Mobile> checkStatusAndGetReponseObject(ResponseEntity<String> response)
 			throws JsonParseException, JsonMappingException, IOException {
 		assertEquals(HttpStatus.OK, response.getStatusCode());

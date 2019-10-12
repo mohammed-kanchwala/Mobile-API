@@ -8,6 +8,12 @@ public class SwaggerConstants {
 	public static final String SWAGGER_HTML_UI = "/swagger-ui.html";
 	public static final String WEB_JARS = "/webjars/**";
 
+	public static final String SWAGGER_PACKAGE = "com.axiom";
+	public static final String SWAGGER_API_TITLE = "Mobile Database Apis";
+	public static final String API_DETAILS = "Api Details";
+	public static final String SWAGGER_VERSION = "1.0";
+
+	
 	private SwaggerConstants() {
 
 	}

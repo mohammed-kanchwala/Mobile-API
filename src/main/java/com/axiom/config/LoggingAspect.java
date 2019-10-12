@@ -9,6 +9,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * Setting up the logging aspect for Project
+ * @author Mohammed Kanchwala
+ *
+ */
 @Aspect
 @Configuration
 public class LoggingAspect {

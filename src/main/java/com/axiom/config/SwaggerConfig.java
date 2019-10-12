@@ -13,23 +13,24 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.axiom.util.ApiConstants;
+import com.axiom.util.swagger.SwaggerConstants;
 
 @Configuration
 @EnableSwagger2
 public class SwaggerConfig {
 
-    @Value("${swagger.enable}")
-    private boolean enableSwagger;
+	@Value("${swagger.enable}")
+	private boolean enableSwagger;
 
-    @Bean
-    public Docket api() {
-        return new Docket(DocumentationType.SWAGGER_2).select()
-                .apis(RequestHandlerSelectors.basePackage(ApiConstants.SWAGGER_PACKAGE)).paths(PathSelectors.any())
-                .build().apiInfo(apiInfo()).enable(enableSwagger);
+	@Bean
+	public Docket api() {
+		return new Docket(DocumentationType.SWAGGER_2).select().apis(RequestHandlerSelectors.any())
+				.paths(PathSelectors.any()).build();
 
-    }
+	}
 
-    private ApiInfo apiInfo() {
-        return new ApiInfoBuilder().title(ApiConstants.SWAGGER_API_TITLE).description(ApiConstants.API_DETAILS).version(ApiConstants.SWAGGER_VERSION).build();
-    }
+	private ApiInfo apiInfo() {
+		return new ApiInfoBuilder().title(SwaggerConstants.SWAGGER_API_TITLE).description(SwaggerConstants.API_DETAILS)
+				.version(SwaggerConstants.SWAGGER_VERSION).build();
+	}
 }

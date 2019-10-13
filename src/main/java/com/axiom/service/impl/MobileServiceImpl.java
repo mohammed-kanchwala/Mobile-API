@@ -42,6 +42,10 @@ public class MobileServiceImpl implements MobileService {
 
     private String mobileDbResponse;
 
+    /**
+     * Loads the Mobile Database which at a rest end point on startup and uses the response to serve the request
+     * using APIs available
+     */
     @PostConstruct
     public void postConstruct() {
         ResponseEntity<String> response = restTemplate.getForEntity(mobileDbApi, String.class);

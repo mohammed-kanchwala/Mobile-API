@@ -4,10 +4,7 @@ import lombok.Data;
 
 @Data
 public class Release {
-	private String announceDate;
-	private Double priceEur;
+    private String announceDate;
+    private Double priceEur;
 
-	public Release() {
-		super();
-	}
 }

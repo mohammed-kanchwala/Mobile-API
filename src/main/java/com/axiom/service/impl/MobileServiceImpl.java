@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import javax.annotation.PostConstruct;
-import javax.servlet.http.HttpServletRequest;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -29,83 +28,118 @@ import com.google.common.base.Objects;
 @Service
 public class MobileServiceImpl implements MobileService {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(MobileServiceImpl.class);
-	@Autowired
-	private RestTemplate restTemplate;
+    private static final Logger LOGGER = LoggerFactory.getLogger(MobileServiceImpl.class);
+    @Autowired
+    private RestTemplate restTemplate;
 
-	@Autowired
-	private ObjectMapper mapper;
+    @Autowired
+    private ObjectMapper mapper;
 
-	@Value("${mobile.db.api}")
-	private String mobileDbApi;
+    @Value("${mobile.db.api}")
+    private String mobileDbApi;
 
-	private String mobileDbResponse;
+    private String mobileDbResponse;
 
-	@PostConstruct
-	public void postConstruct() {
-		ResponseEntity<String> response = restTemplate.getForEntity(mobileDbApi, String.class);
-		mobileDbResponse = response.getBody();
-	}
+    @PostConstruct
+    public void postConstruct() {
+        ResponseEntity<String> response = restTemplate.getForEntity(mobileDbApi, String.class);
+        mobileDbResponse = response.getBody();
+    }
 
-	@Override
-	public List<Mobile> searchMobile(HttpServletRequest request, Map<String, String> params)
-			throws MobileNotFoundException {
-		List<Mobile> mobileList = null;
-		try {
-			JSONArray jsonArray = new JSONArray(mobileDbResponse);
-			JSONArray resultArray = new JSONArray();
+    /**
+     * Searches for Mobile from the Json based the params
+     *
+     * @param params: List of query parameters
+     * @return List of Mobiles
+     * @throws MobileNotFoundException
+     */
+    @Override
+    public List<Mobile> searchMobile(Map<String, String> params)
+            throws MobileNotFoundException {
+        List<Mobile> mobileList;
+        try {
+            JSONArray jsonArray = new JSONArray(mobileDbResponse);
+            JSONArray resultArray = new JSONArray();
 
-			for (Map.Entry<String, String> entry : params.entrySet()) {
-				String key = entry.getKey();
-				String value = entry.getValue();
+            for (Map.Entry<String, String> entry : params.entrySet()) {
+                String key = entry.getKey();
+                key = getValueOfKeyIfPrice(key);
+                String value = entry.getValue();
 
-				for (int i = 0; i <= jsonArray.length() - 1; i++) {
-					JSONObject json = jsonArray.getJSONObject(i);
+                for (int i = 0; i <= jsonArray.length() - 1; i++) {
+                    JSONObject json = jsonArray.getJSONObject(i);
 
-					fetchMobilesBasedOnInputConditions(json, resultArray, key, value);
-				}
-				jsonArray = resultArray;
-				resultArray = new JSONArray();
-			}
+                    fetchMobilesBasedOnInputConditions(json, resultArray, key, value);
+                }
+                jsonArray = resultArray;
+                resultArray = new JSONArray();
+            }
 
-			mobileList = Utility.fetchMobilesFromResponse(jsonArray.toString(), mapper);
-			if (mobileList.isEmpty()) {
-				throw new MobileNotFoundException(ErrorConstants.MOBILE_NOT_FOUND_MESSAGE);
-			}
-		} catch (Exception e) {
-			LOGGER.error(ErrorConstants.SERVICE_EXCEPTION);
-			throw new MobileNotFoundException(ErrorConstants.MOBILE_NOT_FOUND_MESSAGE);
-		}
-		return mobileList;
-	}
+            mobileList = Utility.fetchMobilesFromResponse(jsonArray.toString(), mapper);
+            if (mobileList.isEmpty()) {
+                throw new MobileNotFoundException(ErrorConstants.MOBILE_NOT_FOUND_MESSAGE);
+            }
+        } catch (Exception e) {
+            LOGGER.error(ErrorConstants.SERVICE_EXCEPTION);
+            throw new MobileNotFoundException(ErrorConstants.MOBILE_NOT_FOUND_MESSAGE);
+        }
+        return mobileList;
+    }
 
-	private void fetchMobilesBasedOnInputConditions(JSONObject json, JSONArray resultArray, String key, String value) {
+    /**
+     * Updating the value of key if the key in request is only having "price" instead of "priceEur"
+     *
+     * @param key:  input key
+     * @return key: Updated key
+     */
+    private String getValueOfKeyIfPrice(String key) {
+        key = key.equalsIgnoreCase(ApiConstants.PRICE) ? ApiConstants.PRICE_EUR_KEY : key;
+        return key;
+    }
 
-		boolean isKeyExistInRelease = isKeyExistsInJson(json.getJSONObject(ApiConstants.RELEASE_KEY), key, value);
+    /**
+     * Fetches the List of Mobiles Json based on the input conditions
+     *
+     * @param json:        Input JsonArray which holds the result after the iteration
+     * @param resultArray: JsonArray which holds the result of the iteration
+     * @param key:         parameter from request
+     * @param value:       value of the parameter from the request
+     */
+    private void fetchMobilesBasedOnInputConditions(JSONObject json, JSONArray resultArray, String key, String value) {
 
-		boolean isKeyExistInHardware = isKeyExistsInJson(json.getJSONObject(ApiConstants.HARDWARE_KEY), key, value);
+        boolean isKeyExistInRelease = isKeyExistsInJson(json.getJSONObject(ApiConstants.RELEASE), key, value);
 
-		boolean isKeyExistInMobileParent = isKeyExistsInJson(json, key, value);
+        boolean isKeyExistInHardware = isKeyExistsInJson(json.getJSONObject(ApiConstants.HARDWARE), key, value);
 
-		if (isKeyExistInMobileParent || isKeyExistInRelease || isKeyExistInHardware) {
-			resultArray.put(json);
-		}
-	}
+        boolean isKeyExistInMobileParent = isKeyExistsInJson(json, key, value);
 
-	private boolean isKeyExistsInJson(JSONObject json, String key, String value) {
-		boolean isExists = false;
-		if (json.has(key)) {
-			Object currentValue = json.get(key);
-			if (currentValue instanceof Integer) {
-				if (Objects.equal(currentValue, Integer.parseInt(value))) {
-					isExists = true;
-				}
-			} else if (Pattern.compile(Pattern.quote(value), Pattern.CASE_INSENSITIVE)
-					.matcher((CharSequence) currentValue).find()) {
-				isExists = true;
-			}
-		}
-		return isExists;
-	}
+        if (isKeyExistInMobileParent || isKeyExistInRelease || isKeyExistInHardware) {
+            resultArray.put(json);
+        }
+    }
+
+    /**
+     * Checks if the given key is present in the given Json
+     *
+     * @param json:         Json to check for the key
+     * @param key:          input key to check if it exists in the Json
+     * @param value:        input value which gets compared to the value of the Json based on the input key
+     * @return isExists:    true if the key exists in Json along with the input value
+     */
+    private boolean isKeyExistsInJson(JSONObject json, String key, String value) {
+        boolean isExists = false;
+        if (json.has(key)) {
+            Object currentValue = json.get(key);
+            if (currentValue instanceof Integer) {
+                if (Objects.equal(currentValue, Integer.parseInt(value))) {
+                    isExists = true;
+                }
+            } else if (Pattern.compile(Pattern.quote(value), Pattern.CASE_INSENSITIVE)
+                    .matcher((CharSequence) currentValue).find()) {
+                isExists = true;
+            }
+        }
+        return isExists;
+    }
 
 }

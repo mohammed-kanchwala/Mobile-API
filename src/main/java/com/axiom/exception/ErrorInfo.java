@@ -10,7 +10,7 @@ public class ErrorInfo implements Serializable {
     String code;
     String message;
 
-    ErrorInfo(String code, String message){
+    ErrorInfo(String code, String message) {
         this.code = code;
         this.message = message;
     }

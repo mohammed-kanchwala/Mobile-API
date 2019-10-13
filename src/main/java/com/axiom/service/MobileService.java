@@ -10,7 +10,7 @@ import com.axiom.model.Mobile;
 
 public interface MobileService {
 
-	public List<Mobile> searchMobile(HttpServletRequest request, Map<String, String> search)
-			throws MobileNotFoundException;
+    List<Mobile> searchMobile(Map<String, String> search)
+            throws MobileNotFoundException;
 
 }

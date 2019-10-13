@@ -4,11 +4,8 @@ import lombok.Data;
 
 @Data
 public class Hardware {
-	private String audioJack;
-	private String gps;
-	private String battery;
+    private String audioJack;
+    private String gps;
+    private String battery;
 
-	public Hardware() {
-		super();
-	}
 }

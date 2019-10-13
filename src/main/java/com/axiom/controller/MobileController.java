@@ -1,9 +1,12 @@
 package com.axiom.controller;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+
 import java.util.List;
 import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,25 +21,22 @@ import com.axiom.util.ApiConstants;
 import com.axiom.util.swagger.SwaggerResponse;
 import com.axiom.util.swagger.SwaggerTags;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+;
 
 @RestController
 @RequestMapping(ApiConstants.REQUEST_MAPPING_MOBILE)
-@Api(tags = { ApiConstants.MOBILE_SERVICES })
+@Api(tags = {ApiConstants.MOBILE_SERVICES})
 public class MobileController {
 
-	@Autowired
-	private MobileService searchService;
+    @Autowired
+    private MobileService searchService;
 
-	@GetMapping(ApiConstants.SEARCH)
-	@ApiOperation(value = SwaggerTags.VALUE_MOBILE_SEARCH, notes = SwaggerTags.NOTES_MOBILE_SEARCH)
-	@ApiResponses(value = { @ApiResponse(code = 200, message = SwaggerResponse.MOBILE_SEARCH_DETAILS),
-			@ApiResponse(code = 422, message = SwaggerResponse.SERVICE_EXCEPTION) })
-	public List<Mobile> searchMobile(HttpServletRequest request, @RequestParam Map<String, String> search)
-			throws MobileNotFoundException {
-		return searchService.searchMobile(request, search);
-	}
+    @GetMapping(ApiConstants.SEARCH)
+    @ApiOperation(value = SwaggerTags.VALUE_MOBILE_SEARCH, notes = SwaggerTags.NOTES_MOBILE_SEARCH)
+    @ApiResponses(value = {@ApiResponse(code = 200, message = SwaggerResponse.MOBILE_SEARCH_DETAILS),
+            @ApiResponse(code = 422, message = SwaggerResponse.SERVICE_EXCEPTION)})
+    public List<Mobile> searchMobile(@RequestParam Map<String, String> search)
+            throws MobileNotFoundException {
+        return searchService.searchMobile(search);
+    }
 }

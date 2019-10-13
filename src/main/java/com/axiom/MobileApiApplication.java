@@ -16,30 +16,30 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 @SpringBootApplication
 public class MobileApiApplication {
 
-	@Autowired
-	RestTemplate restTemplate;
+    @Autowired
+    RestTemplate restTemplate;
 
-	public static void main(String[] args) {
-		SpringApplication.run(MobileApiApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(MobileApiApplication.class, args);
+    }
 
-	@Bean
-	public Logbook logBook() {
-		return Logbook.create();
-	}
+    @Bean
+    public Logbook logBook() {
+        return Logbook.create();
+    }
 
-	@Bean
-	public RestTemplate restTemplate(RestTemplateBuilder builder) {
-		return builder.build();
-	}
+    @Bean
+    public RestTemplate restTemplate(RestTemplateBuilder builder) {
+        return builder.build();
+    }
 
-	@Bean
-	public ObjectMapper objectMapper() {
-		ObjectMapper mapper = new ObjectMapper();
-		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-		mapper.configure(MapperFeature.DEFAULT_VIEW_INCLUSION, true);
-		mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
-		return mapper;
-	}
+    @Bean
+    public ObjectMapper objectMapper() {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        mapper.configure(MapperFeature.DEFAULT_VIEW_INCLUSION, true);
+        mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+        return mapper;
+    }
 
 }

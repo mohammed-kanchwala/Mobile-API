@@ -11,31 +11,31 @@ import org.springframework.context.annotation.Configuration;
 
 /**
  * Setting up the logging aspect for Project
- * @author Mohammed Kanchwala
  *
+ * @author Mohammed Kanchwala
  */
 @Aspect
 @Configuration
 public class LoggingAspect {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(LoggingAspect.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(LoggingAspect.class);
 
-	@Before("execution(* com.axiom.controller.*.*(..)) || execution(* com.axiom.service.*.*(..)) || execution(* com.axiom.exception..*.*(..))")
-	public void logBefore(JoinPoint joinpoint) {
-		LOGGER.info("{} :: {}  **Entry**", joinpoint.getSourceLocation().getWithinType().getSimpleName(),
-				joinpoint.getSignature().getName());
-	}
+    @Before("execution(* com.axiom.controller.*.*(..)) || execution(* com.axiom.service.*.*(..)) || execution(* com.axiom.exception..*.*(..))")
+    public void logBefore(JoinPoint joinpoint) {
+        LOGGER.info("{} :: {}  **Entry**", joinpoint.getSourceLocation().getWithinType().getSimpleName(),
+                joinpoint.getSignature().getName());
+    }
 
-	@After("execution(* com.axiom.controller.*.*(..)) || execution(* com.axiom.service.*.*(..)) || execution(* com.axiom.exception.*.*(..))")
-	public void logAfter(JoinPoint joinPoint) {
-		LOGGER.info("{} :: {}  **Exit **", joinPoint.getSourceLocation().getWithinType().getSimpleName(),
-				joinPoint.getSignature().getName());
-	}
+    @After("execution(* com.axiom.controller.*.*(..)) || execution(* com.axiom.service.*.*(..)) || execution(* com.axiom.exception.*.*(..))")
+    public void logAfter(JoinPoint joinPoint) {
+        LOGGER.info("{} :: {}  **Exit **", joinPoint.getSourceLocation().getWithinType().getSimpleName(),
+                joinPoint.getSignature().getName());
+    }
 
-	@AfterThrowing("execution(* com.axiom.controller.*.*(..)) || execution(* com.axiom.service.*.*(..)) || execution(* com.axiom.exception.*.*(..))")
-	public void logException(JoinPoint joinPoint) {
-		LOGGER.info("{} :: {}  **Exception** ", joinPoint.getSourceLocation().getWithinType().getSimpleName(),
-				joinPoint.getSignature().getName());
-	}
+    @AfterThrowing("execution(* com.axiom.controller.*.*(..)) || execution(* com.axiom.service.*.*(..)) || execution(* com.axiom.exception.*.*(..))")
+    public void logException(JoinPoint joinPoint) {
+        LOGGER.info("{} :: {}  **Exception** ", joinPoint.getSourceLocation().getWithinType().getSimpleName(),
+                joinPoint.getSignature().getName());
+    }
 
 }

@@ -1,6 +1,20 @@
 # Mobile-API
 Mobile Search API services with Java 8 and Spring Boot
 
+# Service Details
+Fetches a Json of List of Mobiles from a rest endpoint which is fed as an input to provide an API to search for
+ Mobiles based on different search criteria like annouceDate, priceEur, price
+, brand etc.
+
+#Sample Queries
+http://localhost:8443/mobile/search : returns List of All the Mobiles available
+
+http://localhost:8443/mobile/search?price=200 : returns a List of Mobiles whose price matches the input i.e. (200).
+
+http://localhost:8443/mobile/search?announceDate=1999&price=200 : would return a List of Mobiles whose announceDate is
+(1999) and price is (200).
+
+
 ## Architectural Diagram
 ![Alt text](Mobile-API-Architechture.JPG?raw=true "Architectural Diagram")
 

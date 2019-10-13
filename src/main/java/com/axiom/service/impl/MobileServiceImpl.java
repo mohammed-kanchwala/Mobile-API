@@ -1,5 +1,6 @@
 package com.axiom.service.impl;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -7,6 +8,7 @@ import java.util.regex.Pattern;
 import javax.annotation.PostConstruct;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,7 +64,7 @@ public class MobileServiceImpl implements MobileService {
             JSONArray resultArray = new JSONArray();
 
             for (Map.Entry<String, String> entry : params.entrySet()) {
-                String key = entry.getKey();
+                String key = entry.getKey().toLowerCase();
                 key = getValueOfKeyIfPrice(key);
                 String value = entry.getValue();
 
@@ -89,7 +91,7 @@ public class MobileServiceImpl implements MobileService {
     /**
      * Updating the value of key if the key in request is only having "price" instead of "priceEur"
      *
-     * @param key:  input key
+     * @param key: input key
      * @return key: Updated key
      */
     private String getValueOfKeyIfPrice(String key) {
@@ -121,13 +123,14 @@ public class MobileServiceImpl implements MobileService {
     /**
      * Checks if the given key is present in the given Json
      *
-     * @param json:         Json to check for the key
-     * @param key:          input key to check if it exists in the Json
-     * @param value:        input value which gets compared to the value of the Json based on the input key
+     * @param json:  Json to check for the key
+     * @param key:   input key to check if it exists in the Json
+     * @param value: input value which gets compared to the value of the Json based on the input key
      * @return isExists:    true if the key exists in Json along with the input value
      */
     private boolean isKeyExistsInJson(JSONObject json, String key, String value) {
         boolean isExists = false;
+        json = fetchJsonWithLowerCaseKey(json);
         if (json.has(key)) {
             Object currentValue = json.get(key);
             if (currentValue instanceof Integer) {
@@ -142,4 +145,27 @@ public class MobileServiceImpl implements MobileService {
         return isExists;
     }
 
+
+    /**
+     * Converts the input Json to have all the keys in lower-case
+     * @param jsonObject : Json Object to convert the keys to lower-case
+     * @return JsonObject: Converted JsonObject with all keys to lower-case
+     * @throws JSONException
+     */
+    public JSONObject fetchJsonWithLowerCaseKey(JSONObject jsonObject) throws JSONException {
+        JSONObject resultJsonObject = new JSONObject();
+        Iterator<String> keys = jsonObject.keys();
+        while (keys.hasNext()) {
+            String key = keys.next();
+            Object value;
+            try {
+                JSONObject nestedJsonObject = jsonObject.getJSONObject(key);
+                value = fetchJsonWithLowerCaseKey(nestedJsonObject);
+            } catch (JSONException jsonException) {
+                value = jsonObject.get(key);
+            }
+            resultJsonObject.put(key.toLowerCase(), value);
+        }
+        return resultJsonObject;
+    }
 }

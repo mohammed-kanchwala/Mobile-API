@@ -148,6 +148,18 @@ public class MobileControllerTest {
     }
 
     @Test
+    @DisplayName("Test for brand=Apple & announceDate=2018 & sim=eSIM")
+    public void searchMobile_Brand_Apple_And_AnnounceDate_2018_And_Sim_ESIM_CASEINSENSITIVE() throws Exception {
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(Utility.createURI(port))
+                .queryParam(ApiConstants.BRAND_KEY, "Apple").queryParam("announcedate", "2018")
+                .queryParam("SIM", ApiConstants.NANO_SIM);
+        ResponseEntity<String> response = restTemplate.getForEntity(builder.toUriString(), String.class);
+
+        List<Mobile> mobileList = checkStatusAndGetResponseObject(response);
+        assertEquals(5, mobileList.size());
+    }
+
+    @Test
     @DisplayName("Test for MobileNotFoundException")
     public void searchMobile_MobileNotFoundException() {
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(Utility.createURI(port))

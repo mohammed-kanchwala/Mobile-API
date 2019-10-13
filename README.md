@@ -6,7 +6,8 @@ Fetches a Json of List of Mobiles from a rest endpoint which is fed as an input 
  Mobiles based on different search criteria like annouceDate, priceEur, price
 , brand etc.
 
-#Sample Queries
+# Sample Queries
+
 http://localhost:8443/mobile/search : returns List of All the Mobiles available
 
 http://localhost:8443/mobile/search?price=200 : returns a List of Mobiles whose price matches the input i.e. (200).

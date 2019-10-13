@@ -92,11 +92,11 @@ public class MobileServiceImpl implements MobileService {
      * Updating the value of key if the key in request is only having "price" instead of "priceEur"
      *
      * @param key: input key
-     * @return key: Updated key
+     * @return key: Updated key with lowercase
      */
     private String getValueOfKeyIfPrice(String key) {
         key = key.equalsIgnoreCase(ApiConstants.PRICE) ? ApiConstants.PRICE_EUR_KEY : key;
-        return key;
+        return key.toLowerCase();
     }
 
     /**

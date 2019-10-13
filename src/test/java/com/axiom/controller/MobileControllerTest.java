@@ -148,7 +148,7 @@ public class MobileControllerTest {
     }
 
     @Test
-    @DisplayName("Test for brand=Apple & announceDate=2018 & sim=eSIM")
+    @DisplayName("Test for brand=Apple & announceDate=2018 & sim=eSIM (Case Insensitive)")
     public void searchMobile_Brand_Apple_And_AnnounceDate_2018_And_Sim_ESIM_CASEINSENSITIVE() throws Exception {
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(Utility.createURI(port))
                 .queryParam(ApiConstants.BRAND_KEY, "Apple").queryParam("announcedate", "2018")
